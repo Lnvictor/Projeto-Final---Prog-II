@@ -2,19 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Disciplina{
-    char codigo[10];
-    char nome[100];
-    char prereq[100];
-    int credito;
-} Disciplina;
-
-typedef struct Aluno{
-    int RA;
-    char nome[100];
-    char login[100];
-    char senha[100];
-} Aluno;
+#define TAM 50
 
 int main(){
     int menu;
@@ -41,6 +29,8 @@ int main(){
                 break;
         }
     }while(menu!=0);
+
+
 
     return 0;
 }
