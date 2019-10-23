@@ -30,65 +30,67 @@ int main(){
 
     else{
         char aux[10];
+        int key;
 
-        fclose(Arquivo);
-        printf("[LOGIN]\n");
-        printf("Digite o Username: ");
-        fgets(user, TAM, stdin);
-        printf("Digite a senha: ");
-        fgets(senha, TAM, stdin);
+        do{
+            fclose(Arquivo);
+            printf("[LOGIN]\n");
+            printf("Digite o Username: ");
+            fgets(user, TAM, stdin);
+            printf("Digite a senha: ");
+            fgets(senha, TAM, stdin);
 
-        if(login(user, senha)){
-            do{
-                Sistema* S = carregaD();
-                //Menu
-                printf("[Menu de Opcoes]\n");
-                printf("1. Cadastro de Alunos\n");
-                printf("2. Consulta de Disciplinas\n");
-                printf("0. Sair!\n");
+            key = login(user, senha);
+            if(key == 0)
+                printf("Login Inválido!\n");
+        }while(key != 1);
 
-                scanf("%d",&menu);
+        do{
+            Sistema* S = carregaD();
+            //Menu
+            printf("[Menu de Opcoes]\n");
+            printf("1. Cadastro de Alunos\n");
+            printf("2. Consulta de Disciplinas\n");
+            printf("0. Sair!\n");
 
-                switch(menu){
-                    case 0:
-                        break;
-                    case 1:
-                        printf("[MENU DE CADASTRO]\n" );
-                        getchar();
-                        printf("Digite o nome: ");
-                        fgets(nome, TAM, stdin);
-                        printf("Digite o RA: ");
-                        scanf("%d", &RA);
-                        getchar();
-                        printf("Digite o Username: ");
-                        fgets(user, TAM, stdin);
-                        printf("Digite a senha: ");
-                        fgets(senha, TAM, stdin);
+            scanf("%d",&menu);
 
-                        CadastrarAluno(RA, nome, user, senha);
-                        break;
-                    case 2:
-                        printf("[Consulta de Disciplinas]\n");
-                        printf("Digite o código da disciplina: \n");
-                        scanf("%s", aux);
-                        Disciplina* D = BuscarDisciplina(aux, S);
-                        if(D == NULL){
-                            printf("Não existe\n");
-                        }
-                        else{
-                            printf("%s\n", D->nome);
-                        }
-                        break;
-                    default:
-                        printf("***Opcao Invalida***\n");
-                        break;
-            }
-        }while(menu!=0);
-    }
+            switch(menu){
+                case 0:
+                    break;
+                case 1:
+                    printf("[MENU DE CADASTRO]\n" );
+                    getchar();
+                    printf("Digite o nome: ");
+                    fgets(nome, TAM, stdin);
+                    printf("Digite o RA: ");
+                    scanf("%d", &RA);
+                    getchar();
+                    printf("Digite o Username: ");
+                    fgets(user, TAM, stdin);
+                    printf("Digite a senha: ");
+                    fgets(senha, TAM, stdin);
 
-    else{
-        printf("Login Inválido!\n");
-    }
+                    CadastrarAluno(RA, nome, user, senha);
+                    break;
+                case 2:
+                    printf("[Consulta de Disciplinas]\n");
+                    printf("Digite o código da disciplina: \n");
+                    scanf("%s", aux);
+                    Disciplina* D = BuscarDisciplina(aux, S);
+                    if(D == NULL){
+                        printf("Não existe\n");
+                    }
+                    else{
+                        printf("\n%s\n", D->nome);
+                        printf("Créditos: %d\n", D->credito);
+                    }
+                    break;
+                default:
+                    printf("***Opcao Invalida***\n");
+                    break;
+        }
+    }while(menu!=0);
 
 }
 
