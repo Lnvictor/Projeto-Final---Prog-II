@@ -1,3 +1,9 @@
+// Breno Souza dos Reis             RA: 232246
+// Gilberto da Silva Villa Nova     RA: 173050
+// Victor Henrique Barbosa Pereira   RA: 245055
+
+//main.c - Projeto Final - SI200
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
