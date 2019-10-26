@@ -121,3 +121,11 @@ Disciplina* BuscarDisciplina(char* codigo, Sistema* S){
 
     return D;
 }
+
+// void MatricularAluno(Aluno* A, char* codigo){
+//
+//     FILE* Arquivo;
+//     Arquivo = fopen("Matriculas.txt", "a+");
+//
+//     fclose(Arquivo)
+// }
