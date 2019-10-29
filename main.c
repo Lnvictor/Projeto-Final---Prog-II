@@ -12,7 +12,7 @@
 
 int main(){
     int menu;
-    int RA; char nome[TAM], user[TAM], senha[TAM];
+    int RA; char nome[TAM], user[TAM], senha[TAM], codigos[10][10];
     FILE* Arquivo;
 
     Arquivo = fopen("Alunos.txt", "r");
@@ -57,6 +57,8 @@ int main(){
             printf("[Menu de Opcoes]\n");
             printf("1. Cadastro de Alunos\n");
             printf("2. Consulta de Disciplinas\n");
+            printf("3. Realizar Matricula\n");
+            printf("4. Atualizar nota e falta\n");
             printf("0. Sair!\n");
 
             scanf("%d",&menu);
@@ -64,6 +66,7 @@ int main(){
             switch(menu){
                 case 0:
                     break;
+
                 case 1:
                     printf("[MENU DE CADASTRO]\n" );
                     getchar();
@@ -79,6 +82,7 @@ int main(){
 
                     CadastrarAluno(RA, nome, user, senha);
                     break;
+
                 case 2:
                     printf("[Consulta de Disciplinas]\n");
                     printf("Digite o código da disciplina: \n");
@@ -90,7 +94,16 @@ int main(){
                     else{
                         printf("\n%s\n", D->nome);
                         printf("Créditos: %d\n", D->credito);
+                        printf("Pre Requisitos: %s\n", D->prereq);
                     }
+                    break;
+
+                case 3:
+                    Matricular(user,S);
+                    break;
+
+                case 4:
+                    Atualizar(user, S);
                     break;
                 default:
                     printf("***Opcao Invalida***\n");

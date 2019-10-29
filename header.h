@@ -35,5 +35,7 @@ void CadastrarAluno(int RA, char* nome, char* login, char*senha);
 
 Disciplina* BuscarDisciplina(char* codigo, Sistema* S);
 
-// void MatricularAluno(Aluno* A, char* codigo);
+void Matricular(char*user, Sistema* S);
+
+void Atualizar(char* user, Sistema* S);
 #endif
