@@ -25,6 +25,7 @@ typedef struct Sistema{
 
 Disciplina* newDisciplina(char* codigo, char* nome, char* prereq, int credito);
 
+
 Aluno* newAluno(int RA, char* nome, char* login, char* senha);
 
 Sistema* carregaD();
@@ -38,4 +39,8 @@ Disciplina* BuscarDisciplina(char* codigo, Sistema* S);
 void Matricular(char*user, Sistema* S);
 
 void Atualizar(char* user, Sistema* S);
+
+double retornaCR(int RA, Sistema* S);
+
+void geraRelatorio(char* username, Sistema* S);
 #endif

@@ -3,6 +3,10 @@
 #include <string.h>
 #include "header.h"
 
+int cmp(const void *x, const void *y){
+
+    return *(double*)y - *(double*)x;
+}
 Aluno* newAluno(int RA, char* nome, char* login, char* senha){
     Aluno* A = (Aluno*) malloc (sizeof(Aluno));
 
@@ -428,4 +432,96 @@ void Atualizar(char* user, Sistema* S){
         printf("Transação feita com sucesso!" );
 
     }
+}
+double retornaCR(int RA, Sistema* S){
+    FILE* Arquivo;
+    double nota=0.0;
+    int creditos=0, l=0;
+    char aux[100];
+    Disciplina* D;
+    Arquivo = fopen("AlunosDisciplinas.txt", "r");
+
+    do{
+        if (l == 0)
+            fgets(aux, 100, Arquivo);
+
+        if (RA == atoi(strtok(aux, ","))) {
+            D = BuscarDisciplina(strtok(NULL, ","), S);
+            strtok(NULL, ",");
+            nota = nota + (atof(strtok(NULL, ",")) * D->credito);
+            strtok(NULL, ",");
+            creditos+=D->credito;
+        }
+        else{
+            strtok(NULL, ",");
+            strtok(NULL, ",");
+            strtok(NULL, ",");
+            strtok(NULL, ",");
+        }
+        fgets(aux, 100, Arquivo);
+        l++;
+    }while (!feof(Arquivo));
+
+    fclose(Arquivo);
+    return creditos > 0 ? nota/creditos : 0;
+}
+void geraRelatorio(char* username, Sistema* S){
+    FILE* Arquivo;
+    Aluno* A = RetornaAluno(username);
+    Aluno* B;
+    Disciplina* v[100];
+    char codigo[10], *filename, aux[100], letra;
+    char fimlinha = '\n';
+    int nota, falta, l=0, qtde_alunos = 0, pos_turma = 1;
+    double cr_aluno = retornaCR(A->RA, S);
+    double *cr_todos;
+
+    Arquivo = fopen("Alunos.txt", "r");
+
+    while(fread(&letra, sizeof(char),1, Arquivo)){
+        if(letra == fimlinha){
+            qtde_alunos++;
+        }
+    }
+    fclose(Arquivo);
+
+    Arquivo = fopen("Alunos.txt", "r");
+
+
+    cr_todos = (double*) malloc(qtde_alunos * sizeof(double));
+
+    do{
+        if(l==0)
+            fgets(aux, 100, Arquivo);
+
+        strtok(aux, ",");
+        strtok(NULL, ",");
+        B = RetornaAluno(strtok(NULL, ","));
+        cr_todos[l] = retornaCR(B->RA, S);
+        strtok(NULL, ",");
+
+        fgets(aux, 100, Arquivo);
+        l++;
+    }while(!feof(Arquivo));
+    printf("pass\n" );
+    qsort(cr_todos, qtde_alunos, sizeof(double), cmp);
+    printf("pass\n" );
+
+    for(register int i = 0; i < qtde_alunos; i++){
+        if(cr_aluno < cr_todos[i]){
+            pos_turma++;
+        }
+    }
+
+    filename = strcat(username, ".txt");
+
+    Arquivo = fopen(filename, "w");
+    fprintf(Arquivo, "Faculdade de Tecnologia - UNICAMP\n\n");
+    fprintf(Arquivo, "Relatório de  Matrícula\n\n");
+    fprintf(Arquivo, "Nome Completo: %s\n", A->nome);
+    fprintf(Arquivo, "RA: %d\n", A->RA);
+    fprintf(Arquivo, "Coeficiente de Rendimento: %.2lf\n", cr_aluno);
+    fprintf(Arquivo, "Classificação na Turma: %d de %d\n\n\n", pos_turma, qtde_alunos);
+    fprintf(Arquivo, "Disciplina\tNota\tFaltas (%%)\tSituação\n");
+    fclose(Arquivo);
 }
