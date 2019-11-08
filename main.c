@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include "header.h"
 
 
@@ -57,8 +58,9 @@ int main(){
             printf("[Menu de Opcoes]\n");
             printf("1. Cadastro de Alunos\n");
             printf("2. Consulta de Disciplinas\n");
-            printf("3. Realizar Matricula\n");
+            printf("3. Realizar Matrícula\n");
             printf("4. Atualizar nota e falta\n");
+            printf("5. Gerar Relatório para impressão\n");
             printf("0. Sair!\n");
 
             scanf("%d",&menu);
