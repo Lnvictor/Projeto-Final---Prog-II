@@ -507,11 +507,11 @@ void geraRelatorio(char* username, Sistema* S){
         fgets(aux, 100, Arquivo);
         l++;
     }while (!feof(Arquivo));
-    
+
     rewind(Arquivo);
 
     cr_todos = (double*) malloc(qtde_alunos * sizeof(double));
-    
+
     l=0;int cont = 0;
     do{
         if(l==0)
@@ -528,7 +528,7 @@ void geraRelatorio(char* username, Sistema* S){
             strtok(NULL, ",");
             strtok(NULL, ",");
         }
-        
+
         fgets(aux, 100, Arquivo);
         l++;
     }while(!feof(Arquivo));
@@ -551,7 +551,7 @@ void geraRelatorio(char* username, Sistema* S){
 
         if (atoi(strtok(aux, ",")) == A->RA){
             v[cont] = BuscarDisciplina(strtok(NULL, ","), S);
-            
+
             strtok(NULL, ",");
             notas[cont] = atof(strtok(NULL, ","));
             faltas[cont] = atof(strtok(NULL, ","));
@@ -560,7 +560,7 @@ void geraRelatorio(char* username, Sistema* S){
         fgets(aux, 100, Arquivo);
         l++;
     }while (!feof(Arquivo));
-    
+
     fclose(Arquivo);
     char str_ra[7]; sprintf(str_ra, "%d", A->RA);
     filename = strcat(str_ra, ".txt");
@@ -572,21 +572,21 @@ void geraRelatorio(char* username, Sistema* S){
     fprintf(Arquivo, "RA: %d\n", A->RA);
     fprintf(Arquivo, "Coeficiente de Rendimento: %.2lf\n", cr_aluno);
     fprintf(Arquivo, "Classificação na Turma: %d de %d\n\n\n", pos_turma, qtde_alunos);
-    fprintf(Arquivo,"%-50s%-12s%-15s%-10s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
-    
+    fprintf(Arquivo,"%-15s%-12s%-15s%s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
+
     for(register int i = 0; i < cont; i++){
-        fprintf(Arquivo, "%-50s", v[i]->nome);
-       
+        fprintf(Arquivo, "%-15s", v[i]->codigo);
+
         fprintf(Arquivo, "%-12.2f%-15.2f", notas[i], faltas[i]);
-        
+
         if (notas[i] >= 6 && faltas[i] <25)
-            fprintf(Arquivo,"%-10s","Aprovado\n");
+            fprintf(Arquivo,"%s\n","Aprovado");
         else if (notas[i] < 6 && faltas[i] <25)
-            fprintf(Arquivo,"%-10s","Reprovado por nota\n");
+            fprintf(Arquivo,"%s\n","Reprovado por nota");
         else if (notas[i] >= 6 && faltas[i] >25)
-            fprintf(Arquivo,"%-10s","Reprovado por falta\n");
-        else 
-            fprintf(Arquivo,"%-10s","Reprovado por nota e falta\n");
+            fprintf(Arquivo,"%s\n","Reprovado por falta");
+        else
+            fprintf(Arquivo,"%s\n","Reprovado por nota e falta");
     }
     fclose(Arquivo);
 }
