@@ -480,113 +480,121 @@ void geraRelatorio(char* username, Sistema* S){
     char *filename, aux[100];
     int l=0, qtde_alunos = 0, pos_turma = 1, ra, ra_2;
     float notas[100], faltas[100];
-    double cr_aluno = retornaCR(A->RA, S);
+    double cr_aluno;
     double *cr_todos;
 
-    Arquivo = fopen("Alunos.txt", "r");
+    Arquivo = fopen("AlunosDisciplinas.txt", "r");
 
-    // while(fread(&letra, sizeof(char),1, Arquivo)){
-    //     if(letra == fimlinha){
-    //         qtde_alunos++;
-    //     }
-    // }
+    if (Arquivo == NULL){
+        printf("Aluno não está matriculado em nenhuma disciplina\n");
+    }
 
-    do{
-        if(!l){
-            fgets(aux, 100, Arquivo);
-            ra = atoi(strtok(aux, ","));
-            qtde_alunos++;
-        }
-        else{
-            ra_2 = atoi(strtok(aux, ","));
-            if(ra_2 != ra){
-                ra = ra_2;
+    else{
+        fclose(Arquivo);
+        cr_aluno = retornaCR(A->RA, S);
+
+        Arquivo = fopen("Alunos.txt", "r");
+
+        do{
+            if(!l){
+                fgets(aux, 100, Arquivo);
+                ra = atoi(strtok(aux, ","));
                 qtde_alunos++;
             }
-        }
-        fgets(aux, 100, Arquivo);
-        l++;
-    }while (!feof(Arquivo));
-
-    rewind(Arquivo);
-
-    cr_todos = (double*) malloc(qtde_alunos * sizeof(double));
-
-    l=0;int cont = 0;
-    do{
-        if(l==0)
+            else{
+                ra_2 = atoi(strtok(aux, ","));
+                if(ra_2 != ra){
+                    ra = ra_2;
+                    qtde_alunos++;
+                }
+            }
             fgets(aux, 100, Arquivo);
+            l++;
+        }while (!feof(Arquivo));
 
-        ra = atoi(strtok(aux, ","));
-        strtok(NULL, ",");
-        if (ra != A->RA){
-            B = RetornaAluno(strtok(NULL, ","));
-            cr_todos[cont++] = retornaCR(B->RA, S);
+        rewind(Arquivo);
+
+        cr_todos = (double*) malloc(qtde_alunos * sizeof(double));
+
+        l=0;int cont = 0;
+        do{
+            if(l==0)
+                fgets(aux, 100, Arquivo);
+
+            ra = atoi(strtok(aux, ","));
             strtok(NULL, ",");
+            if (ra != A->RA){
+                B = RetornaAluno(strtok(NULL, ","));
+                cr_todos[cont++] = retornaCR(B->RA, S);
+                strtok(NULL, ",");
+            }
+            else{
+                strtok(NULL, ",");
+                strtok(NULL, ",");
+            }
+
+            fgets(aux, 100, Arquivo);
+            l++;
+        }while(!feof(Arquivo));
+
+        fclose(Arquivo);
+
+        qsort(cr_todos, qtde_alunos, sizeof(double), cmp);
+
+
+        for(register int i = 0; i < cont; i++){
+            if(cr_aluno < cr_todos[i]){
+                pos_turma++;
+            }
         }
-        else{
-            strtok(NULL, ",");
-            strtok(NULL, ",");
+
+        Arquivo = fopen("AlunosDisciplinas.txt", "r");
+
+        l=0; cont = 0;
+        do{
+            if(!l)
+                fgets(aux, 100, Arquivo);
+
+            if (atoi(strtok(aux, ",")) == A->RA){
+                v[cont] = BuscarDisciplina(strtok(NULL, ","), S);
+
+                strtok(NULL, ",");
+                notas[cont] = atof(strtok(NULL, ","));
+                faltas[cont] = atof(strtok(NULL, ","));
+                cont++;
+            }
+            fgets(aux, 100, Arquivo);
+            l++;
+        }while (!feof(Arquivo));
+
+        fclose(Arquivo);
+        char str_ra[7]; sprintf(str_ra, "%d", A->RA);
+        filename = strcat(str_ra, ".txt");
+
+        Arquivo = fopen(filename, "w");
+        fprintf(Arquivo, "Faculdade de Tecnologia - UNICAMP\n\n");
+        fprintf(Arquivo, "Relatório de  Matrícula\n\n");
+        fprintf(Arquivo, "Nome Completo: %s\n", A->nome);
+        fprintf(Arquivo, "RA: %d\n", A->RA);
+        fprintf(Arquivo, "Coeficiente de Rendimento: %.2lf\n", cr_aluno);
+        fprintf(Arquivo, "Classificação na Turma: %d de %d\n\n\n", pos_turma, qtde_alunos);
+        fprintf(Arquivo,"%-15s%-12s%-15s%s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
+
+        for(register int i = 0; i < cont; i++){
+            fprintf(Arquivo, "%-15s", v[i]->codigo);
+
+            fprintf(Arquivo, "%-12.2f%-15.2f", notas[i], faltas[i]);
+
+            if (notas[i] >= 6 && faltas[i] <25)
+                fprintf(Arquivo,"%s\n","Aprovado");
+            else if (notas[i] < 6 && faltas[i] <25)
+                fprintf(Arquivo,"%s\n","Reprovado por nota");
+            else if (notas[i] >= 6 && faltas[i] >25)
+                fprintf(Arquivo,"%s\n","Reprovado por falta");
+            else
+                fprintf(Arquivo,"%s\n","Reprovado por nota e falta");
         }
-
-        fgets(aux, 100, Arquivo);
-        l++;
-    }while(!feof(Arquivo));
-
-    fclose(Arquivo);
-
-    qsort(cr_todos, qtde_alunos, sizeof(double), cmp);
-
-    for(register int i = 0; i < cont; i++){
-        if(cr_aluno < cr_todos[i]){
-            pos_turma++;
-        }
+        fclose(Arquivo);
     }
 
-    Arquivo = fopen("AlunosDisciplinas.txt", "r");
-    l=0; cont = 0;
-    do{
-        if(!l)
-            fgets(aux, 100, Arquivo);
-
-        if (atoi(strtok(aux, ",")) == A->RA){
-            v[cont] = BuscarDisciplina(strtok(NULL, ","), S);
-
-            strtok(NULL, ",");
-            notas[cont] = atof(strtok(NULL, ","));
-            faltas[cont] = atof(strtok(NULL, ","));
-            cont++;
-        }
-        fgets(aux, 100, Arquivo);
-        l++;
-    }while (!feof(Arquivo));
-
-    fclose(Arquivo);
-    char str_ra[7]; sprintf(str_ra, "%d", A->RA);
-    filename = strcat(str_ra, ".txt");
-
-    Arquivo = fopen(filename, "w");
-    fprintf(Arquivo, "Faculdade de Tecnologia - UNICAMP\n\n");
-    fprintf(Arquivo, "Relatório de  Matrícula\n\n");
-    fprintf(Arquivo, "Nome Completo: %s\n", A->nome);
-    fprintf(Arquivo, "RA: %d\n", A->RA);
-    fprintf(Arquivo, "Coeficiente de Rendimento: %.2lf\n", cr_aluno);
-    fprintf(Arquivo, "Classificação na Turma: %d de %d\n\n\n", pos_turma, qtde_alunos);
-    fprintf(Arquivo,"%-15s%-12s%-15s%s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
-
-    for(register int i = 0; i < cont; i++){
-        fprintf(Arquivo, "%-15s", v[i]->codigo);
-
-        fprintf(Arquivo, "%-12.2f%-15.2f", notas[i], faltas[i]);
-
-        if (notas[i] >= 6 && faltas[i] <25)
-            fprintf(Arquivo,"%s\n","Aprovado");
-        else if (notas[i] < 6 && faltas[i] <25)
-            fprintf(Arquivo,"%s\n","Reprovado por nota");
-        else if (notas[i] >= 6 && faltas[i] >25)
-            fprintf(Arquivo,"%s\n","Reprovado por falta");
-        else
-            fprintf(Arquivo,"%s\n","Reprovado por nota e falta");
-    }
-    fclose(Arquivo);
 }

@@ -107,13 +107,15 @@ int main(){
                 case 4:
                     Atualizar(user, S);
                     break;
+                    
                 case 5:
                     geraRelatorio(user, S);
                     break;
                 default:
                     printf("***Opcao Invalida***\n");
                     break;
-        }
+            }
+        
     }while(menu!=0);
 
 }
