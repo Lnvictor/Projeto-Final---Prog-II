@@ -32,13 +32,13 @@ Sistema* carregaD();
 
 int login(char* username, char* senha);
 
-void CadastrarAluno(int RA, char* nome, char* login, char*senha);
+void cadastrarAluno(int RA, char* nome, char* login, char*senha);
 
-Disciplina* BuscarDisciplina(char* codigo, Sistema* S);
+Disciplina* buscarDisciplina(char* codigo, Sistema* S);
 
-void Matricular(char*user, Sistema* S);
+void matricular(char*user, Sistema* S);
 
-void Atualizar(char* user, Sistema* S);
+void atualizar(char* user, Sistema* S);
 
 double retornaCR(int RA, Sistema* S);
 

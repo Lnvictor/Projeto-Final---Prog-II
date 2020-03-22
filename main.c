@@ -14,11 +14,11 @@
 int main(){
     int menu;
     int RA; char nome[TAM], user[TAM], senha[TAM], codigos[10][10];
-    FILE* Arquivo;
+    FILE* arquivo;
 
-    Arquivo = fopen("Alunos.txt", "r");
+    arquivo = fopen("Alunos.txt", "r");
 
-    if (Arquivo == NULL){
+    if (arquivo == NULL){
         printf("[MENU DE CADASTRO]\n" );
 
         printf("Digite o nome: ");
@@ -31,7 +31,7 @@ int main(){
         printf("Digite a senha: ");
         fgets(senha, TAM, stdin);
 
-        CadastrarAluno(RA, nome, user, senha);
+        cadastrarAluno(RA, nome, user, senha);
     }
 
     else{
@@ -39,7 +39,7 @@ int main(){
         int key;
 
         do{
-            fclose(Arquivo);
+            fclose(arquivo);
             printf("[LOGIN]\n");
             printf("Digite o Username: ");
             fgets(user, TAM, stdin);
@@ -52,7 +52,7 @@ int main(){
         }while(key != 1);
 
         do{
-            Sistema* S = carregaD();
+            Sistema* s = carregaD();
 
             //Menu
             printf("[Menu de Opcoes]\n");
@@ -82,34 +82,34 @@ int main(){
                     printf("Digite a senha: ");
                     fgets(senha, TAM, stdin);
 
-                    CadastrarAluno(RA, nome, user, senha);
+                    cadastrarAluno(RA, nome, user, senha);
                     break;
 
                 case 2:
                     printf("[Consulta de Disciplinas]\n");
                     printf("Digite o código da disciplina: \n");
                     scanf("%s", aux);
-                    Disciplina* D = BuscarDisciplina(aux, S);
-                    if(D == NULL){
+                    Disciplina* d = buscarDisciplina(aux, s);
+                    if(d == NULL){
                         printf("Não existe\n");
                     }
                     else{
-                        printf("\n%s\n", D->nome);
-                        printf("Créditos: %d\n", D->credito);
-                        printf("Pre Requisitos: %s\n", D->prereq);
+                        printf("\n%s\n", d->nome);
+                        printf("Créditos: %d\n", d->credito);
+                        printf("Pre Requisitos: %s\n", d->prereq);
                     }
                     break;
 
                 case 3:
-                    Matricular(user,S);
+                    matricular(user,s);
                     break;
 
                 case 4:
-                    Atualizar(user, S);
+                    atualizar(user, s);
                     break;
                     
                 case 5:
-                    geraRelatorio(user, S);
+                    geraRelatorio(user, s);
                     break;
                 default:
                     printf("***Opcao Invalida***\n");

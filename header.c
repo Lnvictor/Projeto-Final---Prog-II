@@ -6,9 +6,11 @@
 
 int cmp(const void *x, const void *y){
 
-    if (*(double*)y >  *(double*)x) return 1;
-    else if (*(double*) y <  *(double*)x) return -1;
-    else return 0;
+    if (*(double *)y > *(double *)x) 
+        return 1;
+    if (*(double *) y <  *(double *)x) 
+        return -1; 
+    return 0;
 
 }
 Aluno* newAluno(int RA, char* nome, char* login, char* senha){
@@ -23,11 +25,11 @@ Aluno* newAluno(int RA, char* nome, char* login, char* senha){
     return A;
 }
 
-Aluno* RetornaAluno(char* Username){
+Aluno* retornaAluno(char* Username){
     char info[100];
     char *nome, *user, *pass;
     int RA;
-    register int i = 0;
+    int i = 0;
 
     FILE* Arquivo;
     Arquivo = fopen("Alunos.txt", "r");
@@ -68,7 +70,7 @@ Disciplina* newDisciplina(char* codigo, char* nome, char* prereq, int credito){
 }
 
 
-void CadastrarAluno(int RA, char* nome, char* login, char* senha){
+void cadastrarAluno(int RA, char* nome, char* login, char* senha){
     FILE* Arquivo;
 
     //Removendo "\n"
@@ -85,7 +87,7 @@ void CadastrarAluno(int RA, char* nome, char* login, char* senha){
 }
 
 int login(char* username, char* senha){
-    int login_Valid = 0;
+    int loginValid = 0;
     char *user, *pass, aux;
     char info[100];
 
@@ -102,117 +104,114 @@ int login(char* username, char* senha){
         pass = strtok(NULL, ",");
 
         if(strcmp(user, username) == 0 && strcmp(pass, senha) == 0){
-            login_Valid = 1;
+            loginValid = 1;
             break;
         }
     }while(fscanf(Arquivo, "%c", &aux) != EOF);
 
-    return login_Valid;
+    return loginValid;
 }
 
 Sistema* newSistema(){
-    Sistema* S = (Sistema*) malloc (sizeof(Sistema));
-    S->v = (Disciplina*) malloc (TAM * sizeof(Disciplina));
-    S->top = 0;
+    Sistema* s = (Sistema*) malloc (sizeof(Sistema));
+    s->v = (Disciplina*) malloc (TAM * sizeof(Disciplina));
+    s->top = 0;
 
     for(int i = 0; i < TAM; i++){
-        strcpy(S->v[i].prereq, "Nenhum");
+        strcpy(s->v[i].prereq, "Nenhum");
     }
-    return S;
+    return s;
 }
 
 Sistema* carregaD(){
-    Sistema* S = newSistema();
-    char aux[100], *aux_2;
+    Sistema* s = newSistema();
+    char aux[100], *aux2;
     int i = 0;
 
-    FILE* Arquivo_D, *Arquivo_P;
-    Arquivo_D = fopen("Disciplinas.txt", "r");
-    Arquivo_P = fopen("Prerequisitos.txt", "r");
+    FILE* ArquivoD, *ArquivoP;
+    ArquivoD = fopen("Disciplinas.txt", "r");
+    ArquivoP = fopen("Prerequisitos.txt", "r");
 
     do{
         i = 0;
-        fgets(aux, 100, Arquivo_D);
-        strcpy(S->v[S->top].codigo,  strtok(aux, ","));
-        strcpy(S->v[S->top].nome,  strtok(NULL, ","));
-        S->v[S->top].credito = atoi(strtok(NULL, ","));
+        fgets(aux, 100, ArquivoD);
+        strcpy(s->v[s->top].codigo,  strtok(aux, ","));
+        strcpy(s->v[s->top].nome,  strtok(NULL, ","));
+        s->v[s->top].credito = atoi(strtok(NULL, ","));
 
         while(!i){
-            fgets(aux, 100, Arquivo_P);
-            aux_2 = strtok(aux, ",");
+            fgets(aux, 100, ArquivoP);
+            aux2 = strtok(aux, ",");
 
-            if(strcmp(aux_2, S->v[S->top].codigo) == 0){
-                strcpy(S->v[S->top].prereq, strtok(NULL, ","));
+            if(strcmp(aux2,    s->v[s->top].codigo) == 0){
+                strcpy(s->v[s->top].prereq, strtok(NULL, ","));
                 i = 1;
             }
         }
-        S->top++;
-    }while(S->top < 42);
+        s->top++;
+    }while(s->top < 42);
 
-    fclose(Arquivo_P);
-    fclose(Arquivo_D);
+    fclose(ArquivoP);
+    fclose(ArquivoD);
 
-    return S;
+    return s;
 }
 
-Disciplina* BuscarDisciplina(char* codigo, Sistema* S){
+Disciplina* buscarDisciplina(char* codigo, Sistema*s){
     int i;
-    Disciplina* D = NULL;
+    Disciplina* disciplina = NULL;
 
-    for(i = 0; i < S->top; i++){
-        if (strcmp(codigo, S->v[i].codigo) == 0){
-            D = newDisciplina(S->v[i].codigo,S->v[i].nome,S->v[i].prereq,S->v[i].credito);
+    for(i = 0; i < s->top; i++){
+        if (strcmp(codigo, s->v[i].codigo) == 0){
+            disciplina = newDisciplina(s->v[i].codigo, s->v[i].nome, s->v[i].prereq, s->v[i].credito);
             break;
         }
     }
 
-    return D;
+    return disciplina;
 }
 
-void Matricular(char* user, Sistema* S) {
-    char aux[100];
-    char *dis_p, dis_p2[10], *dis_p3, codigos[10][10];
+void matricular(char* user, Sistema* s) {
 
-    register int j=0, k, l;
-    int Semestre, w=0, creditos=0, semestre_atual = 0,ra;
-    int validation = 0;
+    char *disP, disP2[10], *disP3, codigos[10][10], aux[100];
+    int semestre, w=0, creditos=0, semestreAtual = 0, ra, j=0, k, l, validation = 0;
     float nota, falta;
 
     Disciplina D[10];
-    FILE* Arquivo;
-    Aluno* A = RetornaAluno(user);
+    FILE* arquivo;
+    Aluno* A = retornaAluno(user);
 
     do{
         l=0;
         if (w > 0)
             printf("Semestre Inválido\n");
         printf("Digite o semestre: ");
-        scanf("%d", &Semestre);
+        scanf("%d", &semestre);
 
-        Arquivo = fopen("AlunosDisciplinas.txt", "r");
+        arquivo = fopen("AlunosDisciplinas.txt", "r");
 
-        if(Arquivo != NULL){
+        if(arquivo != NULL){
             do{
                 if (l==0)
-                    fgets(aux, 100, Arquivo);
+                    fgets(aux, 100, arquivo);
 
                 ra = atoi(strtok(aux, ","));
-                dis_p = strtok(NULL, ",");
+                disP = strtok(NULL, ",");
 
                 if(A->RA == ra){
-                    semestre_atual = atoi(strtok(NULL, ","));
+                    semestreAtual = atoi(strtok(NULL, ","));
                 }
 
                 l++;
-                fgets(aux, 100, Arquivo);
-            }while(!feof(Arquivo)) ;
-            fclose(Arquivo);
+                fgets(aux, 100, arquivo);
+            }while(!feof(arquivo)) ;
+            fclose(arquivo);
         }
         else{
             break;
         }
         w++;
-    }while(Semestre < semestre_atual);
+    }while(semestre < semestreAtual);
 
 
     printf("Digite XX000 para encerrar\n");
@@ -222,9 +221,9 @@ void Matricular(char* user, Sistema* S) {
         printf("Digite o código da disciplina: ");
         scanf("%s", codigos[j]);
 
-        for(register int i = 0; i < S->top; i++){
-            if(strcmp(codigos[j], S->v[i].codigo) == 0){
-                D[j] =  S->v[i];
+        for(register int i = 0; i < s->top; i++){
+            if(strcmp(codigos[j], s->v[i].codigo) == 0){
+                D[j] =  s->v[i];
                 creditos += D[j].credito;
                 w=1;
                 break;
@@ -244,32 +243,32 @@ void Matricular(char* user, Sistema* S) {
     else{
         for(register int i = 0; i < j-1; i++){
             k=0;
-            Arquivo = fopen("AlunosDisciplinas.txt", "r");
+            arquivo = fopen("AlunosDisciplinas.txt", "r");
 
             if(strcmp(D[i].prereq,"\n\0") != 0){
                 //Escrever Lógica de Verificaçãp de prerequisitos denovo
                 do{
                     if (!k){
-                        fgets(aux, 100, Arquivo);
+                        fgets(aux, 100, arquivo);
                     }
 
                     ra = atoi(strtok(aux, ","));
-                    dis_p = strtok(NULL, ",");
+                    disP = strtok(NULL, ",");
 
-                    register int v;
+                    int v;
                     for(v = 0; v < strlen(D[i].prereq)-1; v++){
-                        dis_p2[v] = D[i].prereq[v];
+                        disP2[v] = D[i].prereq[v];
                     }
-                    dis_p2[v] = '\0';
+                    disP2[v] = '\0';
 
 
-                    if(A->RA == ra &&  strcmp(dis_p, dis_p2) == 0){
+                    if(A->RA == ra &&  strcmp(disP, disP2) == 0){
                         strtok(NULL, ",");
 
-                        dis_p = strtok(NULL, ",");
-                        dis_p3 = strtok(NULL, ",");
-                        nota = atof(dis_p);
-                        falta = atof(dis_p3);
+                        disP = strtok(NULL, ",");
+                        disP3 = strtok(NULL, ",");
+                        nota = atof(disP);
+                        falta = atof(disP3);
 
                         if(nota > 5 && falta < 25){
                             validation = 1;
@@ -280,11 +279,11 @@ void Matricular(char* user, Sistema* S) {
                         }
                     }
 
-                    fgets(aux, 100, Arquivo);
+                    fgets(aux, 100, arquivo);
                     k++;
-                }while(!feof(Arquivo));
+                }while(!feof(arquivo));
 
-                fclose(Arquivo);
+                fclose(arquivo);
             }
             else{
                 validation = 1;
@@ -301,9 +300,9 @@ void Matricular(char* user, Sistema* S) {
     if(validation){
 
         for(register int i = 0; i < j-1;i++){
-            Arquivo = fopen("AlunosDisciplinas.txt", "a+");
-            fprintf(Arquivo, "%d,%s,%d,%d,%d\n", A->RA, D[i].codigo, Semestre, 0, 0);
-            fclose(Arquivo);
+            arquivo = fopen("AlunosDisciplinas.txt", "a+");
+            fprintf(arquivo, "%d,%s,%d,%d,%d\n", A->RA, D[i].codigo, semestre, 0, 0);
+            fclose(arquivo);
         }
         printf("Transação feita com sucesso!\n");
 
@@ -311,17 +310,17 @@ void Matricular(char* user, Sistema* S) {
 
 }
 
-void Atualizar(char* user, Sistema* S){
-    Aluno *A = RetornaAluno(user);
-    Disciplina* D[100];
-    int Semestre, semestre_atual, l,w=0,ra,j, TAM_BUFFER, valid=1;
+void atualizar(char* user, Sistema* s){
+    Aluno *a = retornaAluno(user);
+    Disciplina* d[100];
+    int semestre, semestreAtual, l, w=0, ra, j, TAM_BUFFER, valid=1;
     char aux[100], *codigo, buffer[100][100];
     float nota = 0.0, falta =0.0;
-    FILE* Arquivo;
+    FILE* arquivo;
 
     do{
-        Arquivo = fopen("AlunosDisciplinas.txt", "r");
-        if(Arquivo == NULL || !valid){
+        arquivo = fopen("AlunosDisciplinas.txt", "r");
+        if(arquivo == NULL || !valid){
             printf("Você não está matriculado em nenhuma disciplina\n");
             break;
         }
@@ -330,20 +329,20 @@ void Atualizar(char* user, Sistema* S){
         if (w > 0)
             printf("Semestre Inválido\n");
         printf("Digite o semestre: ");
-        scanf("%d", &Semestre);
+        scanf("%d", &semestre);
 
 
 
         do{
             if (l==0){
-                fgets(aux, 100, Arquivo);
+                fgets(aux, 100, arquivo);
             }
 
             ra = atoi(strtok(aux, ","));
             strtok(NULL, ",");
 
-            if(A->RA == ra){
-                semestre_atual = atoi(strtok(NULL, ","));
+            if(a->RA == ra){
+                semestreAtual = atoi(strtok(NULL, ","));
                 valid = 1;
             }
             else{
@@ -351,15 +350,15 @@ void Atualizar(char* user, Sistema* S){
             }
 
             l++;
-            fgets(aux, 100, Arquivo);
-        }while(!feof(Arquivo));
+            fgets(aux, 100, arquivo);
+        }while(!feof(arquivo));
         w++;
-    }while(Semestre > semestre_atual);
+    }while(semestre > semestreAtual);
 
-    rewind(Arquivo);
-    l=0;j=0;
+    rewind(arquivo);
+    l=0; j=0;
 
-    fgets(aux, 100, Arquivo);
+    fgets(aux, 100, arquivo);
     strcpy(buffer[0], aux);
     if (valid){
             do{
@@ -367,41 +366,41 @@ void Atualizar(char* user, Sistema* S){
 
             ra = atoi(strtok(aux, ","));
             codigo = strtok(NULL, ",");
-            semestre_atual = atoi(strtok(NULL, ","));
+            semestreAtual = atoi(strtok(NULL, ","));
 
-            if(A->RA == ra  &&  Semestre == semestre_atual){
+            if(a->RA == ra  &&  semestre == semestreAtual){
                 w = 0;
-                while(w<S->top){
-                    if(!strcmp(codigo,S->v[w].codigo)){
-                        D[j] = BuscarDisciplina(codigo, S);
+                while(w<s->top){
+                    if(!strcmp(codigo, s->v[w].codigo)){
+                        d[j] = buscarDisciplina(codigo, s);
                         j++;
                     }
                     w++;
                 }
             }
             l++;
-            fgets(aux, 100, Arquivo);
+            fgets(aux, 100, arquivo);
             strcpy(buffer[l], aux);
-        }while(!feof(Arquivo));
+        }while(!feof(arquivo));
         TAM_BUFFER =l;
-        fclose(Arquivo);
+        fclose(arquivo);
 
-        for(register int i = 0; i < j;i++){
-            printf("nome: %s\n", D[i]->nome);
-            printf("código: %s\n", D[i]->codigo);
-            printf("Creditos: %d\n", D[i]->credito);
-            printf("Pre-Requisitos: %s\n", D[i]->prereq);
+        for(int i = 0; i < j;i++){
+            printf("nome: %s\n", d[i]->nome);
+            printf("código: %s\n", d[i]->codigo);
+            printf("Creditos: %d\n", d[i]->credito);
+            printf("Pre-Requisitos: %s\n", d[i]->prereq);
         }
         w=0;
         while(!w){
-            register int i;
+            int i;
             if(w>0)
                 printf("Você não esteve matriculado nesta disciplina neste semestre\n");
             printf("Digite o codigo da disciplina: \n");
             scanf("%s", aux);
 
             for (i = 0; i < j; i++) {
-                if(!strcmp(D[i]->codigo, aux)){
+                if(!strcmp(d[i]->codigo, aux)){
                     w++;
                     break;
                 }
@@ -418,20 +417,19 @@ void Atualizar(char* user, Sistema* S){
                     scanf("%f", &falta);
                 }while(falta<0 || falta > 100);
 
-                Arquivo = fopen("AlunosDisciplinas.txt", "w");
+                arquivo = fopen("AlunosDisciplinas.txt", "w");
 
                 for(j = 0; j < TAM_BUFFER;j++){
                     strcpy(aux, buffer[j]);
                     ra = atoi(strtok(aux, ","));
-                    // printf("%s", buffer[j]);
-                    if(A->RA == ra && !strcmp(strtok(NULL, ","),D[i]->codigo)){
-                        fprintf(Arquivo, "%d,%s,%d,%.2f,%.2f\n", A->RA, D[i]->codigo, Semestre, nota, falta);
+                    if(a->RA == ra && !strcmp(strtok(NULL, ","),d[i]->codigo)){
+                        fprintf(arquivo, "%d,%s,%d,%.2f,%.2f\n", a->RA, d[i]->codigo, semestre, nota, falta);
                     }
                     else{
-                        fprintf(Arquivo, "%s", buffer[j]);
+                        fprintf(arquivo, "%s", buffer[j]);
                     }
                 }
-                fclose(Arquivo);
+                fclose(arquivo);
             }
         }
 
@@ -439,24 +437,24 @@ void Atualizar(char* user, Sistema* S){
 
     }
 }
-double retornaCR(int RA, Sistema* S){
-    FILE* Arquivo;
+double retornaCR(int RA, Sistema* s){
+    FILE* arquivo;
     double nota=0.0;
     int creditos=0, l=0;
     char aux[100];
-    Disciplina* D;
-    Arquivo = fopen("AlunosDisciplinas.txt", "r");
+    Disciplina* d;
+    arquivo = fopen("AlunosDisciplinas.txt", "r");
 
     do{
         if (l == 0)
-            fgets(aux, 100, Arquivo);
+            fgets(aux, 100, arquivo);
 
         if (RA == atoi(strtok(aux, ","))) {
-            D = BuscarDisciplina(strtok(NULL, ","), S);
+            d = buscarDisciplina(strtok(NULL, ","), s);
             strtok(NULL, ",");
-            nota = nota + (atof(strtok(NULL, ",")) * D->credito);
+            nota = nota + (atof(strtok(NULL, ",")) * d->credito);
             strtok(NULL, ",");
-            creditos+=D->credito;
+            creditos += d->credito;
         }
         else{
             strtok(NULL, ",");
@@ -464,68 +462,68 @@ double retornaCR(int RA, Sistema* S){
             strtok(NULL, ",");
             strtok(NULL, ",");
         }
-        fgets(aux, 100, Arquivo);
+        fgets(aux, 100, arquivo);
         l++;
-    }while (!feof(Arquivo));
+    }while (!feof(arquivo));
 
-    fclose(Arquivo);
+    fclose(arquivo);
     return creditos > 0 ? nota/creditos : 0;
 }
 
-void geraRelatorio(char* username, Sistema* S){
-    FILE* Arquivo;
-    Aluno* A = RetornaAluno(username);
-    Aluno* B;
+void geraRelatorio(char* username, Sistema* s){
+    FILE* arquivo;
+    Aluno* a = retornaAluno(username);
+    Aluno* b;
     Disciplina* v[100];
     char *filename, aux[100];
-    int l=0, qtde_alunos = 0, pos_turma = 1, ra, ra_2;
+    int l=0, qtdeAlunos = 0, posTurma = 1, ra, ra2;
     float notas[100], faltas[100];
-    double cr_aluno;
-    double *cr_todos;
+    double crAluno;
+    double *crTodos;
 
-    Arquivo = fopen("AlunosDisciplinas.txt", "r");
+    arquivo = fopen("AlunosDisciplinas.txt", "r");
 
-    if (Arquivo == NULL){
+    if (arquivo == NULL){
         printf("Aluno não está matriculado em nenhuma disciplina\n");
     }
 
     else{
-        fclose(Arquivo);
-        cr_aluno = retornaCR(A->RA, S);
+        fclose(arquivo);
+        crAluno = retornaCR(a->RA, s);
 
-        Arquivo = fopen("Alunos.txt", "r");
+        arquivo = fopen("Alunos.txt", "r");
 
         do{
             if(!l){
-                fgets(aux, 100, Arquivo);
+                fgets(aux, 100, arquivo);
                 ra = atoi(strtok(aux, ","));
-                qtde_alunos++;
+                qtdeAlunos++;
             }
             else{
-                ra_2 = atoi(strtok(aux, ","));
-                if(ra_2 != ra){
-                    ra = ra_2;
-                    qtde_alunos++;
+                ra2 = atoi(strtok(aux, ","));
+                if(ra2 != ra){
+                    ra = ra2;
+                    qtdeAlunos++;
                 }
             }
-            fgets(aux, 100, Arquivo);
+            fgets(aux, 100, arquivo);
             l++;
-        }while (!feof(Arquivo));
+        }while (!feof(arquivo));
 
-        rewind(Arquivo);
+        rewind(arquivo);
 
-        cr_todos = (double*) malloc(qtde_alunos * sizeof(double));
+        crTodos = (double*) malloc(qtdeAlunos * sizeof(double));
 
         l=0;int cont = 0;
         do{
             if(l==0)
-                fgets(aux, 100, Arquivo);
+                fgets(aux, 100, arquivo);
 
             ra = atoi(strtok(aux, ","));
             strtok(NULL, ",");
-            if (ra != A->RA){
-                B = RetornaAluno(strtok(NULL, ","));
-                cr_todos[cont++] = retornaCR(B->RA, S);
+            if (ra != a->RA){
+                b = retornaAluno(strtok(NULL, ","));
+                crTodos[cont++] = retornaCR(b->RA, s);
                 strtok(NULL, ",");
             }
             else{
@@ -533,68 +531,67 @@ void geraRelatorio(char* username, Sistema* S){
                 strtok(NULL, ",");
             }
 
-            fgets(aux, 100, Arquivo);
+            fgets(aux, 100, arquivo);
             l++;
-        }while(!feof(Arquivo));
+        }while(!feof(arquivo));
 
-        fclose(Arquivo);
+        fclose(arquivo);
 
-        qsort(cr_todos, qtde_alunos, sizeof(double), cmp);
+        qsort(crTodos, qtdeAlunos, sizeof(double), cmp);
 
 
-        for(register int i = 0; i < cont; i++){
-            if(cr_aluno < cr_todos[i]){
-                pos_turma++;
+        for(int i = 0; i < cont; i++){
+            if(crAluno < crTodos[i]){
+                posTurma++;
             }
         }
 
-        Arquivo = fopen("AlunosDisciplinas.txt", "r");
+        arquivo = fopen("AlunosDisciplinas.txt", "r");
 
         l=0; cont = 0;
         do{
             if(!l)
-                fgets(aux, 100, Arquivo);
+                fgets(aux, 100, arquivo);
 
-            if (atoi(strtok(aux, ",")) == A->RA){
-                v[cont] = BuscarDisciplina(strtok(NULL, ","), S);
+            if (atoi(strtok(aux, ",")) == a->RA){
+                v[cont] = buscarDisciplina(strtok(NULL, ","), s);
 
                 strtok(NULL, ",");
                 notas[cont] = atof(strtok(NULL, ","));
                 faltas[cont] = atof(strtok(NULL, ","));
                 cont++;
             }
-            fgets(aux, 100, Arquivo);
+            fgets(aux, 100, arquivo);
             l++;
-        }while (!feof(Arquivo));
+        }while (!feof(arquivo));
 
-        fclose(Arquivo);
-        char str_ra[7]; sprintf(str_ra, "%d", A->RA);
-        filename = strcat(str_ra, ".txt");
+        fclose(arquivo);
+        char strRa[7]; sprintf(strRa, "%d", a->RA);
+        filename = strcat(strRa, ".txt");
 
-        Arquivo = fopen(filename, "w");
-        fprintf(Arquivo, "Faculdade de Tecnologia - UNICAMP\n\n");
-        fprintf(Arquivo, "Relatório de  Matrícula\n\n");
-        fprintf(Arquivo, "Nome Completo: %s\n", A->nome);
-        fprintf(Arquivo, "RA: %d\n", A->RA);
-        fprintf(Arquivo, "Coeficiente de Rendimento: %.2lf\n", cr_aluno);
-        fprintf(Arquivo, "Classificação na Turma: %d de %d\n\n\n", pos_turma, qtde_alunos);
-        fprintf(Arquivo,"%-15s%-12s%-15s%s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
+        arquivo = fopen(filename, "w");
+        fprintf(arquivo, "Faculdade de Tecnologia - UNICAMP\n\n");
+        fprintf(arquivo, "Relatório de  Matrícula\n\n");
+        fprintf(arquivo, "Nome Completo: %s\n", a->nome);
+        fprintf(arquivo, "RA: %d\n", a->RA);
+        fprintf(arquivo, "Coeficiente de Rendimento: %.2lf\n", crAluno);
+        fprintf(arquivo, "Classificação na Turma: %d de %d\n\n\n", posTurma, qtdeAlunos);
+        fprintf(arquivo,"%-15s%-12s%-15s%s\n", "Disciplina","Nota","Faltas(%%)","Situação:");
 
-        for(register int i = 0; i < cont; i++){
-            fprintf(Arquivo, "%-15s", v[i]->codigo);
+        for(int i = 0; i < cont; i++){
+            fprintf(arquivo, "%-15s", v[i]->codigo);
 
-            fprintf(Arquivo, "%-12.2f%-15.2f", notas[i], faltas[i]);
+            fprintf(arquivo, "%-12.2f%-15.2f", notas[i], faltas[i]);
 
             if (notas[i] >= 6 && faltas[i] <25)
-                fprintf(Arquivo,"%s\n","Aprovado");
+                fprintf(arquivo,"%s\n","Aprovado");
             else if (notas[i] < 6 && faltas[i] <25)
-                fprintf(Arquivo,"%s\n","Reprovado por nota");
+                fprintf(arquivo,"%s\n","Reprovado por nota");
             else if (notas[i] >= 6 && faltas[i] >25)
-                fprintf(Arquivo,"%s\n","Reprovado por falta");
+                fprintf(arquivo,"%s\n","Reprovado por falta");
             else
-                fprintf(Arquivo,"%s\n","Reprovado por nota e falta");
+                fprintf(arquivo,"%s\n","Reprovado por nota e falta");
         }
-        fclose(Arquivo);
+        fclose(arquivo);
     }
-
 }
